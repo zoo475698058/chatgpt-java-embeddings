@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+milvus:
+  ip: 192.168.2.140
+  port: 19530
+
+spring:
+  servlet:
+    multipart.max-file-size: 10MB
+    multipart.max-request-size: 10MB
