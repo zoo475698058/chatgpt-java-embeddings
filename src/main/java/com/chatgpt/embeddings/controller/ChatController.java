@@ -1,7 +1,6 @@
 package com.chatgpt.embeddings.controller;
 
-import com.chatgpt.embeddings.DocParser.AbstractParser;
-import com.chatgpt.embeddings.DocParser.PdfParse;
+import com.chatgpt.embeddings.util.DocParse;
 import com.chatgpt.embeddings.config.DataArchive;
 import com.chatgpt.embeddings.config.MilvusConfig;
 import com.chatgpt.embeddings.vo.PDFData;
@@ -76,44 +75,58 @@ public class ChatController {
         }
     }
 
-    @PostMapping("/upload")
-    public ReplyMsg upload(MultipartFile file) {
+    @PostMapping("/uploadPdf")
+    public ReplyMsg uploadPdf(MultipartFile file) {
         try {
-            AbstractParser pdfParse = new PdfParse();
-            List<String> sentenceList = pdfParse.parse(file.getInputStream());
-
-            OpenAiClient v2 = OpenAiClient.builder()
-                    .apiKey(Arrays.asList(KEY))
-                    .apiHost(HOST)
-                    .build();
-
-            List<Integer> contentWordCount = new ArrayList<>();
-            List<List<Float>> contentVector = new ArrayList<>();
-            for (String str : sentenceList) {
-                contentWordCount.add(str.length());
-                EmbeddingResponse embeddings = v2.embeddings(str);
-                if (embeddings == null) {
-                    return ReplyMsg.retErrorMsg("openai embeddings error");
-                }
-                List<BigDecimal> vector = embeddings.getData().get(0).getEmbedding();
-                List<Float> vectors = vector.stream().map(BigDecimal::floatValue).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-                contentVector.add(vectors);
-            }
-
-            List<InsertParam.Field> fields = new ArrayList<>();
-            fields.add(new InsertParam.Field(DataArchive.Field.CONTENT, sentenceList));
-            fields.add(new InsertParam.Field(DataArchive.Field.CONTENT_COUNT, contentWordCount));
-            fields.add(new InsertParam.Field(DataArchive.Field.CONTENT_VECTOR, contentVector));
-
-            InsertParam insertParam = InsertParam.newBuilder()
-                    .withCollectionName(DataArchive.COLLECTION_NAME)
-                    .withFields(fields)
-                    .build();
-            R<MutationResult> resultR = milvusConfig.milvusClient().insert(insertParam);
-            return ReplyMsg.retSuccess(resultR.getStatus());
+            DocParse parse = new DocParse();
+            List<String> sentenceList = parse.pdfParse(file.getInputStream());
+            return insertVector(sentenceList);
         } catch (Exception e) {
             return ReplyMsg.retErrorMsg(e.getMessage());
         }
+    }
+
+    @PostMapping("/uploadTxt")
+    public ReplyMsg uploadTxt(MultipartFile file) {
+        try {
+            DocParse parse = new DocParse();
+            List<String> sentenceList = parse.txtParse(file.getInputStream());
+            return insertVector(sentenceList);
+        } catch (Exception e) {
+            return ReplyMsg.retErrorMsg(e.getMessage());
+        }
+    }
+
+    private ReplyMsg insertVector(List<String> sentenceList){
+        OpenAiClient v2 = OpenAiClient.builder()
+                .apiKey(Arrays.asList(KEY))
+                .apiHost(HOST)
+                .build();
+
+        List<Integer> contentWordCount = new ArrayList<>();
+        List<List<Float>> contentVector = new ArrayList<>();
+        for (String str : sentenceList) {
+            contentWordCount.add(str.length());
+            EmbeddingResponse embeddings = v2.embeddings(str);
+            if (embeddings == null) {
+                return ReplyMsg.retErrorMsg("openai embeddings error");
+            }
+            List<BigDecimal> vector = embeddings.getData().get(0).getEmbedding();
+            List<Float> vectors = vector.stream().map(BigDecimal::floatValue).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+            contentVector.add(vectors);
+        }
+
+        List<InsertParam.Field> fields = new ArrayList<>();
+        fields.add(new InsertParam.Field(DataArchive.Field.CONTENT, sentenceList));
+        fields.add(new InsertParam.Field(DataArchive.Field.CONTENT_COUNT, contentWordCount));
+        fields.add(new InsertParam.Field(DataArchive.Field.CONTENT_VECTOR, contentVector));
+
+        InsertParam insertParam = InsertParam.newBuilder()
+                .withCollectionName(DataArchive.COLLECTION_NAME)
+                .withFields(fields)
+                .build();
+        R<MutationResult> resultR = milvusConfig.milvusClient().insert(insertParam);
+        return ReplyMsg.retSuccess(resultR.getStatus());
     }
 
     private List<PDFData> search(List<List<Float>> search_vectors) {

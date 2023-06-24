@@ -1,18 +1,20 @@
-package com.chatgpt.embeddings.DocParser;
+package com.chatgpt.embeddings.util;
 
+import cn.hutool.core.io.IoUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PdfParse extends AbstractParser {
+public class DocParse {
     private static final int MAX_LENGTH = 200;
 
-    @Override
-    public List<String> parse(InputStream inputStream) throws IOException {
+    public List<String> pdfParse(InputStream inputStream) throws IOException {
         // 打开 PDF 文件
         PDDocument document = PDDocument.load(inputStream);
         // 创建 PDFTextStripper 对象
@@ -27,7 +29,9 @@ public class PdfParse extends AbstractParser {
             if (s.length() > MAX_LENGTH) {
                 for (int index = 0; index < sentence.length; index = (index + 1) * MAX_LENGTH) {
                     String substring = s.substring(index, MAX_LENGTH);
-                    if(substring.length() < 5) continue;
+                    if(substring.length() < 5) {
+                        continue;
+                    }
                     ans.add(substring);
                 }
             } else {
@@ -36,6 +40,12 @@ public class PdfParse extends AbstractParser {
         }
         // 关闭文档
         document.close();
+        return ans;
+    }
+
+    public List<String> txtParse(InputStream inputStream) throws IOException {
+        List<String> ans = new ArrayList<>();
+        ans = IoUtil.readLines(inputStream, Charset.forName("utf-8"), ans);
         return ans;
     }
 }
