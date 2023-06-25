@@ -5,10 +5,7 @@ package com.chatgpt.embeddings.config;
  * @date 2023/4/28
  */
 public class DataArchive {
-    /**
-     * 数据库名称
-     */
-    public static final String DATABASE_NAME = "xh_data";
+
     /**
      * 数据集名称
      */

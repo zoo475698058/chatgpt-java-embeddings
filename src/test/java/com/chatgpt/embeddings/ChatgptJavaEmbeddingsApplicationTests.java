@@ -28,7 +28,6 @@ class ChatgptJavaEmbeddingsApplicationTests {
     void dropCollection(MilvusServiceClient client){
         client.dropCollection(
                 DropCollectionParam.newBuilder()
-                        .withDatabaseName(DataArchive.DATABASE_NAME)
                         .withCollectionName(DataArchive.COLLECTION_NAME)
                         .build()
         );
@@ -56,7 +55,6 @@ class ChatgptJavaEmbeddingsApplicationTests {
                 .withDimension(DataArchive.DATA_DIMENSION)
                 .build();
         CreateCollectionParam createCollectionReq = CreateCollectionParam.newBuilder()
-                .withDatabaseName(DataArchive.DATABASE_NAME)
                 .withCollectionName(DataArchive.COLLECTION_NAME)
                 .withShardsNum(DataArchive.SHARDS_NUM)
                 .addFieldType(fieldType1)
@@ -71,7 +69,6 @@ class ChatgptJavaEmbeddingsApplicationTests {
         final String INDEX_PARAM = "{\"nlist\":1024}";
         client.createIndex(
                 CreateIndexParam.newBuilder()
-                        .withDatabaseName(DataArchive.DATABASE_NAME)
                         .withCollectionName(DataArchive.COLLECTION_NAME)
                         .withFieldName(DataArchive.Field.CONTENT_VECTOR)
                         .withIndexType(IndexType.IVF_FLAT)
