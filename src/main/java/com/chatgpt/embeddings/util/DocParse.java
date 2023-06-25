@@ -1,6 +1,7 @@
 package com.chatgpt.embeddings.util;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class DocParse {
     private static final int MAX_LENGTH = 200;
+    private static final int MIN_LENGTH = 3;
 
     public List<String> pdfParse(InputStream inputStream) throws IOException {
         // 打开 PDF 文件
@@ -44,8 +46,17 @@ public class DocParse {
     }
 
     public List<String> txtParse(InputStream inputStream) throws IOException {
+        List<String> textList = new ArrayList<>();
+        textList = IoUtil.readLines(inputStream, Charset.forName("utf-8"), textList);
+
         List<String> ans = new ArrayList<>();
-        ans = IoUtil.readLines(inputStream, Charset.forName("utf-8"), ans);
+        for (String text:textList) {
+            text = text.replaceAll("\\s", " ").replaceAll("(\\r\\n|\\r|\\n|\\n\\r)"," ");
+            if (StrUtil.isBlank(text) || text.length() < MIN_LENGTH) {
+                continue;
+            }
+            ans.add(text);
+        }
         return ans;
     }
 }

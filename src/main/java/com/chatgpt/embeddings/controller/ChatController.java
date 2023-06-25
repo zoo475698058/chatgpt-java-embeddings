@@ -40,6 +40,7 @@ import java.util.Map;
 public class ChatController {
     private final static String KEY = "";
     private final static String HOST = "";
+    
     @Autowired
     private MilvusConfig milvusConfig;
 
@@ -122,6 +123,7 @@ public class ChatController {
         fields.add(new InsertParam.Field(DataArchive.Field.CONTENT_VECTOR, contentVector));
 
         InsertParam insertParam = InsertParam.newBuilder()
+                .withDatabaseName(DataArchive.DATABASE_NAME)
                 .withCollectionName(DataArchive.COLLECTION_NAME)
                 .withFields(fields)
                 .build();
@@ -133,6 +135,7 @@ public class ChatController {
         MilvusServiceClient milvusClient = milvusConfig.milvusClient();
         milvusClient.loadCollection(
                 LoadCollectionParam.newBuilder()
+                        .withDatabaseName(DataArchive.DATABASE_NAME)
                         .withCollectionName(DataArchive.COLLECTION_NAME)
                         .build()
         );

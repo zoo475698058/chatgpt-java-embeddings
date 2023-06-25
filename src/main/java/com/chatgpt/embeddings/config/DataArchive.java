@@ -6,6 +6,10 @@ package com.chatgpt.embeddings.config;
  */
 public class DataArchive {
     /**
+     * 数据库名称
+     */
+    public static final String DATABASE_NAME = "xh_data";
+    /**
      * 数据集名称
      */
     public static final String COLLECTION_NAME = "embeddings_data";
