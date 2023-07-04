@@ -31,7 +31,7 @@ sudo rm -rf  volumes
 
 ### 可视化组件
 ```
-docker run -p 8800:3000 -e HOST_URL=http://{your_ip}:8800 -e MILVUS_URL={your_ip}:19530 milvusdb/milvus-insight:latest
+docker run -d -p 8800:3000 -e HOST_URL=http://{your_ip}:8800 -e MILVUS_URL={your_ip}:19530 milvusdb/milvus-insight:latest
 ```
 
 ### 项目配置
