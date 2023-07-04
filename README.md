@@ -29,6 +29,11 @@ sudo docker-compose down
 要在停止Milvus后删除数据，运行：
 sudo rm -rf  volumes
 
+### 可视化组件
+```
+docker run -p 8800:3000 -e HOST_URL=http://{your_ip}:8800 -e MILVUS_URL={your_ip}:19530 milvusdb/milvus-insight:latest
+```
+
 ### 项目配置
 application.yml中配置向量数据库连接地址和端口
 项目test文件夹下的ChatgptJavaEmbeddingsApplicationTests.java，运行prepare函数创建表结构
