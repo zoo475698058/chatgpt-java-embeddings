@@ -21,9 +21,16 @@
 wget https://github.com/milvus-io/milvus/releases/download/v2.2.2/milvus-standalone-docker-compose.yml -O docker-compose.yml
 sudo docker-compose up -d
 ```
+#### 检查容器状态
+sudo docker-compose ps
+#### 停止Milvus
+要停止Milvus单机版，运行：
+sudo docker-compose down
+要在停止Milvus后删除数据，运行：
+sudo rm -rf  volumes
 
+### 项目配置
 application.yml中配置向量数据库连接地址和端口
-
 项目test文件夹下的ChatgptJavaEmbeddingsApplicationTests.java，运行prepare函数创建表结构
 
 
