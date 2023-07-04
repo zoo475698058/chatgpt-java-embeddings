@@ -33,6 +33,9 @@ sudo rm -rf  volumes
 ```
 docker run -d -p 8800:3000 -e HOST_URL=http://{your_ip}:8800 -e MILVUS_URL={your_ip}:19530 milvusdb/milvus-insight:latest
 ```
+```
+docker run -d -p 8800:3000 -e HOST_URL=http://{your_ip}:8800 -e MILVUS_URL={你的IP地址}:19530 zilliz/attu:latest
+```
 
 ### 项目配置
 application.yml中配置向量数据库连接地址和端口
